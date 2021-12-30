@@ -59,6 +59,17 @@ app.get('/movies/get', (req, res)=>{
     });
 })
 
+app.get('/movies/get/by-title', (req, res) => {
+    res.send({status:200, data:movies.sort(function(a, b){return a.title - b.title}),})
+})
+app.get('/movies/get/by-rating', (req, res) => {
+    res.send({status:200, data:movies.sort(function(a, b){return b.rating - a.rating}),})
+})
+
+app.get('/movies/get/by-date', (req, res) => {
+    res.send({status:200, data:movies.sort(function(a, b){return b.year - a.year}),})
+})
+
 app.get('/movies/edit', (req, res)=>{
     res.send();
 })
