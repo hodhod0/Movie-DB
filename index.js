@@ -47,20 +47,53 @@ app.get("/search", (req, res) => {
   }
 });
 
-app.get("/movies/add", (req, res) => {
-  res.send();
+app.get("/movies/add", function (req, res) {
+  if (
+    req.query.title != "" &&
+    req.query.title != undefined &&
+    req.query.year != "" &&
+    req.query.year != undefined &&
+    req.query.year.length == 4 &&
+    !isNaN(req.query.year)
+  ) {
+    newMovie = {
+      title: req.query.title,
+      year: req.query.year,
+      rating:
+        req.query.rating == "" || req.query.rating == undefined
+          ? 4
+          : req.query.rating,
+    };
+    movies.push(newMovie);
+    res.status(200).send(JSON.stringify(movies[movies.length - 1]));
+  } else {
+    res
+      .status(404)
+      .send({
+        status: 403,
+        error: true,
+        message:
+          "you cannot create a movie without providing a title and a year",
+      });
+  }
 });
 
 app.get("/movies/read/id/:id", (req, res) => {
-  const id=req.params.id;
-  const movie=movies.find(x=>x.title===id);
-  if(movie)
-  {res.send({
-    status: 200,
-    data: movie,
-  });
-}else{
-    res.status(404).send({status:404, error:true, message:`the movie ${id} does not exist`})
+  const id = req.params.id;
+  const movie = movies.find((x) => x.title === id);
+  if (movie) {
+    res.send({
+      status: 200,
+      data: movie,
+    });
+  } else {
+    res
+      .status(404)
+      .send({
+        status: 404,
+        error: true,
+        message: `the movie ${id} does not exist`,
+      });
   }
 });
 
@@ -88,6 +121,14 @@ app.get("/movies/get/by-date", (req, res) => {
       return b.year - a.year;
     }),
   });
+});
+
+app.get("/movies/read", (req, res) => {
+  if (movies.length == 0) {
+    res.status(404).send("the list is emty");
+  } else {
+    res.status(200).send(JSON.stringify(movies));
+  }
 });
 
 app.get("/movies/edit", (req, res) => {
