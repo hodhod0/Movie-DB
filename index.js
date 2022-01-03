@@ -67,14 +67,11 @@ app.get("/movies/add", function (req, res) {
     movies.push(newMovie);
     res.status(200).send(JSON.stringify(movies[movies.length - 1]));
   } else {
-    res
-      .status(404)
-      .send({
-        status: 403,
-        error: true,
-        message:
-          "you cannot create a movie without providing a title and a year",
-      });
+    res.status(404).send({
+      status: 403,
+      error: true,
+      message: "you cannot create a movie without providing a title and a year",
+    });
   }
 });
 
@@ -87,13 +84,11 @@ app.get("/movies/read/id/:id", (req, res) => {
       data: movie,
     });
   } else {
-    res
-      .status(404)
-      .send({
-        status: 404,
-        error: true,
-        message: `the movie ${id} does not exist`,
-      });
+    res.status(404).send({
+      status: 404,
+      error: true,
+      message: `the movie ${id} does not exist`,
+    });
   }
 });
 
@@ -134,8 +129,22 @@ app.get("/movies/read", (req, res) => {
 app.get("/movies/edit", (req, res) => {
   res.send();
 });
-app.get("/movies/delete", (req, res) => {
-  res.send();
+app.get("/movies/delete/:id", function (req, res) {
+  if (req.params.id < 0 || req.params.id > movies.length - 1) {
+    res
+      .status(404)
+      .send(
+        `{status:404, error:true, message:'the movie ${req.params.id} does not exist'}`
+      );
+  } else {
+    res
+      .status(200)
+      .send(
+        `This movie (${JSON.stringify(
+          movies.splice(req.params.id, 1)
+        )}) is deleted`
+      );
+  }
 });
 
 app.listen(port, () => {
