@@ -157,6 +157,7 @@ app.put("/movies/edit/:id", (req, res) => {
   }
   if(rating != undefined && rating != ""){
     movies[id].rating=rating
+    
   }
 
   res.send(movies[id]);
