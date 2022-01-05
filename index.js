@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const port = 3000;
+var request = require('request');
 
 const movies = [
   { title: "Jaws", year: 1975, rating: 8 },
@@ -10,7 +11,23 @@ const movies = [
 ];
 
 app.get("/", (req, res) => res.send("Ok"));
-
+// app.get('/testhttp',(req,res)=>{
+//   try{
+//     var options = {
+//       'method': 'GET',
+//       'url': 'http://localhost:3000/time',
+//       'headers': {
+//       }
+//     };
+//     request(options, function (error, response) {
+//       console.log(error);
+//       if (error) res.send({err:error});
+//      res.send(response.body);
+//     });
+//   }catch(e){
+// res.send({error:e});
+//   }
+// })
 app.get("/test", (req, res) => {
   res.send({ status: 200, message: "Ok" });
 });
@@ -47,33 +64,6 @@ app.get("/search", (req, res) => {
   }
 });
 
-app.get("/movies/add", function (req, res) {
-  if (
-    req.query.title != "" &&
-    req.query.title != undefined &&
-    req.query.year != "" &&
-    req.query.year != undefined &&
-    req.query.year.length == 4 &&
-    !isNaN(req.query.year)
-  ) {
-    newMovie = {
-      title: req.query.title,
-      year: req.query.year,
-      rating:
-        req.query.rating == "" || req.query.rating == undefined
-          ? 4
-          : req.query.rating,
-    };
-    movies.push(newMovie);
-    res.status(200).send(JSON.stringify(movies[movies.length - 1]));
-  } else {
-    res.status(404).send({
-      status: 403,
-      error: true,
-      message: "you cannot create a movie without providing a title and a year",
-    });
-  }
-});
 
 app.get("/movies/read/id/:id", (req, res) => {
   const id = req.params.id;
@@ -126,10 +116,52 @@ app.get("/movies/read", (req, res) => {
   }
 });
 
-app.get("/movies/edit", (req, res) => {
-  res.send();
+app.post("/movies/add", function (req, res) {
+  if (
+    req.query.title != "" &&
+    req.query.title != undefined &&
+    req.query.year != "" &&
+    req.query.year != undefined &&
+    req.query.year.length == 4 &&
+    !isNaN(req.query.year)
+  ) {
+    newMovie = {
+      title: req.query.title,
+      year: req.query.year,
+      rating:
+        req.query.rating == "" || req.query.rating == undefined
+          ? 4
+          : req.query.rating,
+    };
+    movies.push(newMovie);
+    res.status(200).send(JSON.stringify(movies[movies.length - 1]));
+  } else {
+    res.status(404).send({
+      status: 403,
+      error: true,
+      message: "you cannot create a movie without providing a title and a year",
+    });
+  }
 });
-app.get("/movies/delete/:id", function (req, res) {
+
+app.put("/movies/edit/:id", (req, res) => {
+  title = req.query.title
+  id = req.params.id
+  year = req.query.year
+  rating = req.query.rating
+  if(title != undefined && title !=""){
+    movies[id].title=title
+  }
+  if(year != undefined && year !="" && year.length==4 &&  !isNaN(year)){
+    movies[id].year=year
+  }
+  if(rating != undefined && rating != ""){
+    movies[id].rating=rating
+  }
+
+  res.send(movies[id]);
+});
+app.delete("/movies/delete/:id",  (req, res) => {
   if (req.params.id < 0 || req.params.id > movies.length - 1) {
     res
       .status(404)
